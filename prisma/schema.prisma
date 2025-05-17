@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// db models
+
+model User{
+  id          String      @id    @default(cuid())
+  clerkUserId String      @unique
+  name        String?
+  email       String      @unique
+  imageUrl    String?
+  collections Collection[]        // array references to other tables
+  entries     Entry[]
+  draft       Draft?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+
+model Collection{
+  id            String      @id    @default(cuid())
+  name          String
+  description   String    
+  // defining relationship with userId as a foriegn key to User table
+  userId        String      
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  entries     Entry[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  //collections need to be unique
+  @@unique([name,userId])
+}
+
+
+model Entry{
+  id              String      @id    @default(cuid())
+  title           String
+  content         String      @db.Text      // for longer texts
+  mood            String
+  moodScore       Int
+  moodImageUrl    String?
+
+  // relations with user and collection
+  userId        String      
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collectionId  String
+  collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+
+model Draft{
+  id           String      @id    @default(cuid())
+  title        String?
+  content      String?     @db.Text
+  mood         String?
+  //relation
+  userId        String     @unique      // draft to be unique to a single user 
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
