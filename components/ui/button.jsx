@@ -9,6 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        journal : "px-4 py-1 border border-orange-600 bg-orange-700/70 backdrop-blur-sm rounded text-white cursor-pointer hover:bg-orange-700/60",
         default:
           "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         destructive:
