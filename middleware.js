@@ -10,6 +10,9 @@ export default clerkMiddleware(async (auth, req) => {
   }
 });
 
+// shield and bot detection - using "arcjet" 
+
+
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
