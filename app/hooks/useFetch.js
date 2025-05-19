@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 
 // a custom hook to handle all states related to asynchronous data feching
     // we give the hook a function (cb) so it knows what to run.
@@ -18,10 +19,9 @@ export default function useFetch(cb) {
             const response = await cb(...args)  // call the server action, with the provided args, set the data to the state
             setData(response)
             setError(null)
-        } catch (error) {
-            console.error("Complete Log of ERRRRR  : ",error);
-            
+        } catch (error) {    
             setError(error)
+            toast.error(error.message, {richColors:true})
         }finally{
             setLoading(false)
         }

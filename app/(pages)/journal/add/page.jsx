@@ -45,7 +45,7 @@ const AddJournalPage = () => {
   // to render content title reactively
   const selectedMood = watch("mood");
 
-
+//JOURNAL ENTRY
   // calling useFetch hook to invoke server action to make journal entry
     const { data: addJournalData,
       error : addJournalError,
@@ -55,21 +55,19 @@ const AddJournalPage = () => {
 
     const onSubmit = async (data) => {
       addJournalFn({...data})    // calling the fn, passing title, mood, content, and collectionId(optional)
+      
     };
-    
     // if formSubmitted successfully, the data must be returned
     // routing to the collections page after successful journal entry
     useEffect(() => {
-      if(addJournalError){
-        toast.error("Error adding Journal entry!",{richColors:true});
-        console.error(addJournalError);
-      }
       if(addJournalData && !addJournalLoading){
         router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous" }`)
         toast.success("Journal entry added successfully!", {richColors:true});
       }
-
     },[addJournalData,addJournalLoading, addJournalError])
+
+
+
 
 
   return (
