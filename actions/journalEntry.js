@@ -19,7 +19,7 @@ export async function journalEntry(data) {
             throw new Error("Unauthorized request!")
         }
     
-        // arcjet sheidings
+        // arcjet rate limiting
     
         
         // find user
