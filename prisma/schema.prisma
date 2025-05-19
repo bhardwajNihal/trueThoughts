@@ -57,8 +57,8 @@ model Entry{
   // relations with user and collection
   userId        String      
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  collectionId  String
-  collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  collectionId  String?
+  collection    Collection?  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

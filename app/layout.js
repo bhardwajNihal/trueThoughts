@@ -9,7 +9,8 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
-} from "@clerk/nextjs";
+} from "@clerk/nextjs"; 
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
           <div className="bg-[url('/bg.png')] fixed inset-0 -z-50" />
           <Header />
           {children}
+          <Toaster />
           <Footer />
         </body>
       </html>

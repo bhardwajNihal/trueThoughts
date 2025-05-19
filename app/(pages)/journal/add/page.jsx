@@ -1,11 +1,11 @@
 "use client"
 import dynamic from 'next/dynamic';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import 'react-quill-new/dist/quill.snow.css';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { journalEntrySchema } from '@/lib/zodSchemas';
-import { BarLoader } from 'react-spinners';
+import { BarLoader, ClipLoader } from 'react-spinners';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -16,15 +16,20 @@ import {
 } from "@/components/ui/select"
 import { getMoodById, MOODS } from '@/lib/moods';
 import { Button } from '@/components/ui/button';
-import { LogIn } from 'lucide-react';
-
-
+import useFetch from '@/app/hooks/useFetch';
+import { addJournalEntry } from '@/actions/journalEntry';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 
 const AddJournalPage = () => {
+
+  const router = useRouter()
+  // const [addJournalLoading, setAddJournalLoading] = useState(false);
+
 
   // initializing useform
   // control is used to handle 3rd party components inside hook-form
@@ -37,23 +42,41 @@ const AddJournalPage = () => {
       collectionId: ""
     }
   })
-
   // to render content title reactively
   const selectedMood = watch("mood");
 
-  const onSubmit = (data) => {    
-    if(errors){
-      console.log(errors);
-    }
-    console.log(data);
+
+  // calling useFetch hook to invoke server action to make journal entry
+    const { data: addJournalData,
+      error : addJournalError,
+      loading : addJournalLoading,
+      fn : addJournalFn
+    } = useFetch(addJournalEntry)
+
+    const onSubmit = async (data) => {
+      addJournalFn({...data})    // calling the fn, passing title, mood, content, and collectionId(optional)
+    };
     
-   };
+    // if formSubmitted successfully, the data must be returned
+    // routing to the collections page after successful journal entry
+    useEffect(() => {
+      if(addJournalError){
+        toast.error("Error adding Journal entry!",{richColors:true});
+        console.error(addJournalError);
+      }
+      if(addJournalData && !addJournalLoading){
+        router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous" }`)
+        toast.success("Journal entry added successfully!", {richColors:true});
+      }
+
+    },[addJournalData,addJournalLoading, addJournalError])
+
 
   return (
     <div>
       <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>Have some thoughts? Start Journaling...</h2>
 
-      {/* <BarLoader width={"100%"} color='orange'/> */}
+      {addJournalLoading && <BarLoader width={"100%"} color='orange'/>}
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -95,8 +118,8 @@ const AddJournalPage = () => {
           <Controller
             name="content"
             control={control}
-            render={({ field }) => 
-             <ReactQuill
+            render={({ field }) =>
+              <ReactQuill
                 className={`backdrop-blur bg-gray-100 border border-orange-500 rounded-lg overflow-hidden`}
                 theme="snow"
                 value={field.value}
@@ -118,7 +141,7 @@ const AddJournalPage = () => {
 
         {/* collection input */}
 
-        <Button variant="journal" className={`px-8 my-4`} type="submit">Publish</Button>
+        <Button disabled={addJournalLoading} variant="journal" className={`h-9 w-32 sm:w-44 my-6`} type="submit">{addJournalLoading ? <ClipLoader size={"15px"} color='white'/> : "Publish"}</Button>
 
       </form>
     </div>
