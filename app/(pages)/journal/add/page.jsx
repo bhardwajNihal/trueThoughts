@@ -1,6 +1,6 @@
 "use client"
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import 'react-quill-new/dist/quill.snow.css';
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,61 +20,75 @@ import useFetch from '@/app/hooks/useFetch';
 import { addJournalEntry } from '@/actions/journalEntry';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { getCollections } from '@/actions/collections';
+import AddCollectionModal from '@/components/AddCollectionModal';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-
 const AddJournalPage = () => {
 
   const router = useRouter()
-  // const [addJournalLoading, setAddJournalLoading] = useState(false);
+  const [addCollectionsPopup, setAddCollectionsPopup] = useState(false);
 
 
   // initializing useform
   // control is used to handle 3rd party components inside hook-form
-  const { register, handleSubmit, control, formState: { errors }, getValues, watch } = useForm({
-    resolver: zodResolver(journalEntrySchema),
-    defaultValues: {
-      title: "",
-      content: "",
-      mood: "",
-      collectionId: ""
-    }
-  })
+  const { register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    watch } = useForm({
+      resolver: zodResolver(journalEntrySchema),
+      defaultValues: {
+        title: "",
+        content: "",
+        mood: "",
+        collectionId: ""
+      }
+    })
   // to render content title reactively
   const selectedMood = watch("mood");
 
-//JOURNAL ENTRY
+  //JOURNAL ENTRY
   // calling useFetch hook to invoke server action to make journal entry
-    const { data: addJournalData,
-      error : addJournalError,
-      loading : addJournalLoading,
-      fn : addJournalFn
-    } = useFetch(addJournalEntry)
+  const { data: addJournalData,
+    loading: addJournalLoading,
+    fn: addJournalFn
+  } = useFetch(addJournalEntry)
 
-    const onSubmit = async (data) => {
-      addJournalFn({...data})    // calling the fn, passing title, mood, content, and collectionId(optional)
-      
-    };
-    // if formSubmitted successfully, the data must be returned
-    // routing to the collections page after successful journal entry
-    useEffect(() => {
-      if(addJournalData && !addJournalLoading){
-        router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous" }`)
-        toast.success("Journal entry added successfully!", {richColors:true});
-      }
-    },[addJournalData,addJournalLoading, addJournalError])
+  const onSubmit = async (data) => {
+    addJournalFn({ ...data })    // calling the fn, passing title, mood, content, and collectionId(optional)
 
+  };
+  // if formSubmitted successfully, the data must be returned
+  // routing to the collections page after successful journal entry
+  useEffect(() => {
+    if (addJournalData && !addJournalLoading) {
+      router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous"}`)
+      toast.success("Journal entry added successfully!", { richColors: true });
+    }
+  }, [addJournalData, addJournalLoading])
 
 
+  // FETCHING COLLECTIONS 
+  const {
+    loading: collectionLoading,
+    error: collectionError,
+    fn: fetchCollectionFn,
+    data: collectionsData,
+  } = useFetch(getCollections)
+
+  useEffect(() => {
+    fetchCollectionFn();
+  }, [])
 
 
   return (
     <div>
       <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>Have some thoughts? Start Journaling...</h2>
 
-      {addJournalLoading && <BarLoader width={"100%"} color='orange'/>}
+      {addJournalLoading && <BarLoader width={"100%"} color='orange' />}
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -139,9 +153,42 @@ const AddJournalPage = () => {
 
         {/* collection input */}
 
-        <Button disabled={addJournalLoading} variant="journal" className={`h-9 w-32 sm:w-44 my-6`} type="submit">{addJournalLoading ? <ClipLoader size={"15px"} color='white'/> : "Publish"}</Button>
+        <div className="collection py-4">
+          <label className='md:text-lg font-semibold text-amber-700'>
+            Organize journals by adding to a collection
+          </label>
+          <Controller
+            name='collectionId'
+            control={control}
+            render={({ field }) => {
+              return <Select onValueChange={(value) => {
+                if (value == "new") {
+                  setAddCollectionsPopup(true)
+                }
+                else {
+                  field.onChange(value)
+                }
+              }} value={field.value}>
+                <SelectTrigger className={`w-full bg-gray-100 backdrop-blur border border-orange-500 ${errors.mood ? "border-2 border-red-500" : ""}`}>
+                  <SelectValue placeholder="Choose a Collection..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {collectionsData && collectionsData.map(collection =>
+                    <SelectItem key={collection.id} value={collection.id}>{collection.name}</SelectItem>
+                  )}
+                  <SelectItem value="new" className={`text-amber-700`}>+ Create new Collection</SelectItem>
+                </SelectContent>
+              </Select>
+            }}
+          />
+        </div>
+
+        <Button disabled={addJournalLoading} variant="journal" className={`h-9 w-32 sm:w-44 my-6`} type="submit">{addJournalLoading ? <ClipLoader size={"15px"} color='white' /> : "Publish"}</Button>
 
       </form>
+
+      <AddCollectionModal open={addCollectionsPopup} setOpen={setAddCollectionsPopup} fetchCollections={fetchCollectionFn}/>
+
     </div>
 
   )

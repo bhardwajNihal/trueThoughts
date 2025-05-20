@@ -7,9 +7,10 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 export async function addCollections(data) {
+    
   try {
     const { userId } = await auth();
-
+    
     if (!userId) {
       throw new Error("Unauthorized request!");
     }
@@ -17,23 +18,21 @@ export async function addCollections(data) {
     // arcjet rate limiting
     const req = await request();
     const decision = await aj.protect(req, { userId, requested: 1 }); // Deduct 1 tokens from the bucket per request
-    // console.log("Arcjet decision", decision);
 
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
-        //     console.error( {
-        //       code: "RATE_LIMIT_EXCEEDED",
-        //       details: {
-        //         remaining_requests: decision.reason.remaining,
-        //         resetIn: decision.reason.resetTime,
-        //       }});
+            console.error( {
+              code: "RATE_LIMIT_EXCEEDED",
+              details: {
+                remaining_requests: decision.reason.remaining,
+                resetIn: decision.reason.resetTime,
+              }});
 
-        //     throw new Error("Too many Requests! Try again later.");
+            throw new Error("Too many Requests! Try again later.");
 
-        //   }
+          }
         throw new Error("Request blocked due to some reason");
       }
-    }
 
     // find user
     const foundUser = await dbClient.User.findUnique({
@@ -41,18 +40,30 @@ export async function addCollections(data) {
         clerkUserId: userId,
       },
     });
+    
 
     if (!foundUser) throw new Error("User not found!");
+
+    // check if collection with same name exists
+    const collectionNameExists = await dbClient.Collection.findUnique({
+        where : {
+            name : data.name.toLowerCase()
+        }
+    })
+    
+    if(collectionNameExists){
+        throw new Error("Collection with this name already exists!")
+    }
 
     // add entry to collections
     const addedCollection = await dbClient.Collection.create({
       data: {
-        name: data.name,
+        name: data.name.toLowerCase(),
         description: data.description,
         userId: foundUser.id,
       },
     });
-
+    
     revalidatePath("/dashboard");
     return addedCollection;
   } catch (error) {
@@ -88,6 +99,6 @@ export async function getCollections() {
     return collections;
 
   } catch (error) {
-    throw new Error(error.message);
+    throw error;
   }
 }

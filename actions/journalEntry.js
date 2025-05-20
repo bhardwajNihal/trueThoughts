@@ -6,9 +6,7 @@ import { getPixabayImage } from "@/lib/getImage";
 import { MOODS } from "@/lib/moods";
 import { request } from "@arcjet/next";
 import { auth } from "@clerk/nextjs/server";
-import { LogIn } from "lucide-react";
 import { revalidatePath } from "next/cache";
-import { toast } from "sonner";
 
 // server actions directly enables us to do all tasks that are done by apis
 // but without writing separate apis. These are just functions doing all the server related tasks, like talking to a db.
@@ -22,27 +20,25 @@ export async function addJournalEntry(data) {
       throw new Error("Unauthorized request!");
     }
 
-
-// arcjet rate limiting
+    // arcjet rate limiting
     const req = await request();
     const decision = await aj.protect(req, { userId, requested: 1 }); // Deduct 1 tokens from the bucket per request
     // console.log("Arcjet decision", decision);
 
     if (decision.isDenied()) {
-
       if (decision.reason.isRateLimit()) {
-    //     console.error( {
-    //       code: "RATE_LIMIT_EXCEEDED",
-    //       details: {
-    //         remaining_requests: decision.reason.remaining,
-    //         resetIn: decision.reason.resetTime,
-    //       }});
-        
-    //     throw new Error("Too many Requests! Try again later.");
+        console.error({
+          code: "RATE_LIMIT_EXCEEDED",
+          details: {
+            remaining_requests: decision.reason.remaining,
+            resetIn: decision.reason.resetTime,
+          },
+        });
 
-    //   }
-        throw new Error("Request blocked due to some reason");
-    }}
+        throw new Error("Too many Requests! Try again later.");
+      }
+      throw new Error("Request blocked due to some reason");
+    }
 
     // find user
     const foundUser = await dbClient.User.findUnique({

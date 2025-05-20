@@ -31,7 +31,7 @@ model User{
 
 model Collection{
   id            String      @id    @default(cuid())
-  name          String
+  name          String      @unique
   description   String    
   // defining relationship with userId as a foriegn key to User table
   userId        String      
