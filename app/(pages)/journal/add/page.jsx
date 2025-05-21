@@ -38,6 +38,7 @@ const AddJournalPage = () => {
     handleSubmit,
     control,
     formState: { errors },
+    reset,
     watch } = useForm({
       resolver: zodResolver(journalEntrySchema),
       defaultValues: {
@@ -65,16 +66,15 @@ const AddJournalPage = () => {
   // routing to the collections page after successful journal entry
   useEffect(() => {
     if (addJournalData && !addJournalLoading) {
-      router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous"}`)
+      // router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous"}`)
       toast.success("Journal entry added successfully!", { richColors: true });
+      reset();
     }
   }, [addJournalData, addJournalLoading])
 
 
   // FETCHING COLLECTIONS 
   const {
-    loading: collectionLoading,
-    error: collectionError,
     fn: fetchCollectionFn,
     data: collectionsData,
   } = useFetch(getCollections)
