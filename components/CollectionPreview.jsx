@@ -19,14 +19,14 @@ const CollectionPreview = ({ type, entries, collectionName }) => {
             {(type == "new") 
             ? <div
                 onClick={() => setAddCollectionModalOpen(true)}
-                className='h-56 w-64 bg-gray-100 border-gray-400 shadow-lg cursor-pointer duration-200 shadow-gray-400 hover:shadow-gray-500 rounded-xl flex flex-col items-center justify-center'>
+                className='h-56 bg-gray-100 border-gray-400 shadow-lg cursor-pointer duration-200 shadow-gray-400 hover:shadow-gray-500 rounded-xl flex flex-col items-center justify-center'>
                 <span className='text-3xl text-gray-600 rounded-full p-2 px-4 '>+</span>
                 <span className='text-gray-600'>Create a new Collection</span>
             </div>
 
             :<div 
             onClick={() => router.push(`/collection/${type=="miscellaneous" ? "miscellaneous" : collectionName}`)}
-            className="h-56 w-64 bg-gray-100 rounded-xl shadow-xl overflow-hidden relative group hover:scale-[1.02] transition-transform duration-200 ease-in-out">
+            className="h-56 bg-gray-100 rounded-xl shadow-xl overflow-hidden relative group hover:scale-[1.02] transition-transform duration-200 ease-in-out">
 
                 {/* Header */}
                 <div className="bg-amber-100/80 px-4 py-2">
