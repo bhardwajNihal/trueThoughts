@@ -1,15 +1,15 @@
-
 import { getCollections } from '@/actions/collections';
 import { getEntries } from '@/actions/entries'
 import CollectionPreview from '@/components/CollectionPreview';
 import React from 'react'
+import MoodAnalytics from '@/components/MoodAnalytics';
 
 const Dashboard = async () => {
 
   const entries = await getEntries();
   const collections = await getCollections()
-  console.log("entries : ", entries);
-  console.log("collections : ", collections);
+  // console.log("entries : ", entries);
+  // console.log("collections : ", collections);
 
   const organizeEntriesByCollection = entries.reduce((acc, entry) => {
     const collectionIdKey = entry.collectionId || "miscellaneous";
@@ -20,11 +20,13 @@ const Dashboard = async () => {
     return acc;
   }, {})
 
-  console.log("Organized entries : ", organizeEntriesByCollection);
+  // console.log("Organized entries : ", organizeEntriesByCollection);
 
   return (
     <div className='p-4 sm:p-12 md:p-24'>
-      <div className="mood-graph min-h-[40vh]"></div>
+      <div className="mood-graph min-h-[40vh]">
+        <MoodAnalytics/>
+      </div>
 
       <div className="collections">
         <h2 className='text-3xl font-semibold md:5xl text-amber-700 mb-3 text-center sm:text-start'>Collections</h2>
