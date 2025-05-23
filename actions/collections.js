@@ -137,3 +137,53 @@ export async function getCollection(collectionName) {
     throw error;
   }
 }
+
+
+
+export async function deleteCollection(collectionName) {
+
+  console.log(collectionName);
+  
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      throw new Error("Unauthorized request!");
+    }
+
+    // find user
+    const foundUser = await dbClient.User.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+    
+    if (!foundUser) throw new Error("User not found!");
+
+    // find collection
+    const collection = await dbClient.Collection.findUnique({
+      where : {
+        name : collectionName,
+        userId : foundUser.id
+      }
+    })
+
+    if(!collection) {
+      throw new Error("Collection not found!")
+    }
+
+    // fetch the collections from the db belonging to the logged in user
+    await dbClient.Collection.delete({
+      where: {
+        id : collection.id
+      },
+
+    });
+    
+    revalidatePath("/dashboard")
+    return collection;
+
+  } catch (error) {
+    throw error;
+  }
+}

@@ -15,8 +15,20 @@ import { Button } from './ui/button'
 import { useRouter } from 'next/navigation'
 import { htmlToText } from 'html-to-text'
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import useFetch from '@/app/hooks/useFetch'
+import { deleteCollection } from '@/actions/collections'
+import { toast } from 'sonner'
+import { ClipLoader } from 'react-spinners'
 
-const FilterEntriesComp = ({ entries }) => {
+
+const FilterEntriesComp = ({ entries, collectionName }) => {
 
     const router = useRouter();
     const [filteredEntries, setFilteredEntries] = useState(entries)
@@ -24,28 +36,47 @@ const FilterEntriesComp = ({ entries }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedMood, setSelectedMood] = useState("");
     const [selectedDate, setSelectedDate] = useState(null);
+    const [deleteDialog, setDeleteDialog] = useState(false);
 
     useEffect(() => {
         // client-side filter logic
         let filtered = entries;         // initially set to hold all entries
 
-        if(searchQuery){
+        if (searchQuery) {
             filtered = filtered.filter(entry => {
-                if((entry.title.toLowerCase()).includes(searchQuery.toLowerCase()) || (entry.content.toLowerCase()).includes(searchQuery.toLowerCase())) return entry;
+                if ((entry.title.toLowerCase()).includes(searchQuery.toLowerCase()) || (entry.content.toLowerCase()).includes(searchQuery.toLowerCase())) return entry;
             })
         }
 
-        if(selectedMood){
-            filtered = filtered.filter(item => item.mood==selectedMood)
+        if (selectedMood) {
+            filtered = filtered.filter(item => item.mood == selectedMood)
         }
 
-        if(selectedDate){
-            filtered = filtered.filter(item => isSameDay(selectedDate,item.createdAt))
+        if (selectedDate) {
+            filtered = filtered.filter(item => isSameDay(selectedDate, item.createdAt))
         }
         setFilteredEntries(filtered);
 
     }, [searchQuery, selectedDate, selectedMood])
 
+
+    const {
+        data: deletedCollection,
+        loading: isDeleting,
+        fn: deleteCollectionFn
+    } = useFetch(deleteCollection)
+
+    function handleDeleteCollection() {
+        deleteCollectionFn(collectionName);
+    }
+
+    useEffect(() => {
+        if (deletedCollection && !isDeleting) {
+            setDeleteDialog(false);
+            router.push("/dashboard");
+            toast.success(`${collectionName} collection Deleted Successfully!`)
+        }
+    }, [deletedCollection, isDeleting])
 
     function handleClearFilter() {
         setSearchQuery("")
@@ -58,7 +89,11 @@ const FilterEntriesComp = ({ entries }) => {
 
             <div className=''>
                 <div className='flex gap-2 justify-end ' >
-                    <Button className={`border border-red-500 text-red-500 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white`}><Trash /><span>Delete Collection</span></Button>
+                    {collectionName !== "all" && <Button
+                        onClick={() => setDeleteDialog(true)}
+                        className={`border border-red-500 text-red-500 rounded-lg bg-gray-100 hover:bg-red-600 hover:text-white`}>
+                        <Trash /><span>Delete Collection</span>
+                    </Button>}
                     {(searchQuery || selectedDate || selectedMood) &&
                         <Button variant="outline"
                             onClick={handleClearFilter}
@@ -118,22 +153,44 @@ const FilterEntriesComp = ({ entries }) => {
 
             <div className="entries my-5 sm:my-1 px-4">
                 <p className='text-sm text-gray-500 backdrop-blur-lg'>showing {filteredEntries.length} out of {entries.length} entries</p>
-                {filteredEntries && filteredEntries.length >0 
-                ? filteredEntries?.map(entry => 
-                <div
-                key={entry.id}
-                onClick={()=> router.push(`/journal/${entry.id}`)}
-                className='bg-gray-100 hover:scale-[1.01] hover:shadow-amber-600 duration-200 shadow-sm shadow-gray-500 rounded-lg my-3 relative px-4 py-2 flex flex-col gap-1'
-                >
-                <div className='w-full'>{entry.moodDetails?.emoji} <span className='truncate max-w-[80%] text-lg sm:text-xl font-semibold text-amber-600'>{entry.title}</span></div>
-                <div className='truncate max-w-[80%] '>{htmlToText(entry.content)}</div>
-                <div className='absolute bottom-2 right-3 text-gray-500 text-sm text-gray-700'>{formatDate(entry.createdAt,"PPP")}</div>
-                <span className='bg-amber-200 w-fit text-orange-700 px-4 rounded'>{entry.collection?.name}</span>
-                </div>)
-                
-                : <div className='w-full text-center text-amber-500 mt-8 text-lg font-semibold'>No entries found!</div>
-            }
+                {filteredEntries && filteredEntries.length > 0
+                    ? filteredEntries?.map(entry =>
+                        <div
+                            key={entry.id}
+                            onClick={() => router.push(`/journal/${entry.id}`)}
+                            className='bg-gray-100 hover:scale-[1.01] hover:shadow-amber-600 duration-200 shadow-sm shadow-gray-500 rounded-lg my-3 relative px-4 py-2 flex flex-col gap-1'
+                        >
+                            <div className='w-full'>{entry.moodDetails?.emoji} <span className='truncate max-w-[80%] text-lg sm:text-xl font-semibold text-amber-600'>{entry.title}</span></div>
+                            <div className='truncate max-w-[80%] '>{htmlToText(entry.content)}</div>
+                            <div className='absolute bottom-2 right-3 text-gray-500 text-sm text-gray-700'>{formatDate(entry.createdAt, "PPP")}</div>
+                            <span className='bg-amber-200 w-fit text-orange-700 px-4 rounded'>{entry.collection?.name}</span>
+                        </div>)
+
+                    : <div className='w-full text-center text-amber-500 mt-8 text-lg font-semibold'>No entries found!</div>
+                }
             </div>
+
+            <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className={"text-lg text-amber-700 font-semibold mb-1"}>Delete "{collectionName}" collection?</DialogTitle>
+                        <DialogDescription>
+                            <span className="text-red-500 mb-6">This action cannot be undone. This will permanently delete this collection and all the journals associated with it!</span>
+                            <div className='flex justify-end gap-2'>
+                                <Button 
+                                onClick={() => setDeleteDialog(false)}
+                                variant="outline">Cancel</Button>
+                                <Button
+                                    onClick={handleDeleteCollection}
+                                    variant="destructive"
+                                    className={"min-w-32"}
+                                    >{isDeleting ? <ClipLoader size={"15px"} color='white'/> : "Delete"}</Button>
+                            </div>
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+
         </div>
     )
 }

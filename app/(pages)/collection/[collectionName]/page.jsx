@@ -38,7 +38,7 @@ const CollectionsPage = async ({ params }) => {
             <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text pt-2 pb-1'>{collectionName} journals</h2>
             
             {/* render entries*/}
-            <FilterEntriesComp entries={entries}/>
+            <FilterEntriesComp entries={entries} collectionName={collectionName}/>
 
         </div>
     )
