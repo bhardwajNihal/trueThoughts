@@ -75,7 +75,7 @@ export async function getAnalytics(period = "7d") {
     );
 
     // create overall stats to show at the top
-    // total entrys in the given time period
+    // total entries in the given time period
     // average mood score
     // most frequent mood
     // daily average

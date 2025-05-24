@@ -63,3 +63,39 @@ export async function getEntries({collectionId, orderBy = "desc"} = {}) {    //d
         throw error
     }
 }
+
+
+export async function getEntry(entryId) {    //decreasing order by default
+    
+    try {
+        const {userId} = await auth();
+        if(!userId) throw new Error("Request Unauthorized!");
+    
+        
+        const foundUser = await dbClient.User.findUnique({
+            where : {
+                clerkUserId : userId
+            }
+        })
+        
+        if(!foundUser) throw new Error("User not found!");
+    
+        const entry = await dbClient.Entry.findUnique({
+            where : {
+                id : entryId
+            },
+            include : {
+                collection : {
+                    select : {
+                        id : true,
+                        name : true
+                    }
+                }
+            }
+        })
+
+        return entry;
+    } catch (error) {
+        throw error
+    }
+}

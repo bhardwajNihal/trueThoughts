@@ -23,7 +23,7 @@ const Dashboard = async () => {
   // console.log("Organized entries : ", organizeEntriesByCollection);
 
   return (
-    <div className='px-8 sm:px-12 md:px-20'>
+    <div >
 
       <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>DashBoard</h2>
 
