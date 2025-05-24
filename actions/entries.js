@@ -99,3 +99,36 @@ export async function getEntry(entryId) {    //decreasing order by default
         throw error
     }
 }
+
+export default  async function deleteEntry(entryId) {
+     try {
+        const {userId} = await auth();
+        if(!userId) throw new Error("Request Unauthorized!");
+    
+        
+        const foundUser = await dbClient.User.findUnique({
+            where : {
+                clerkUserId : userId
+            }
+        })
+        
+        if(!foundUser) throw new Error("User not found!");
+    
+        const foundEntry = await dbClient.Entry.findUnique({
+            where : {
+                id : entryId
+            }
+        })
+        if(!foundEntry) throw new Error("entry not found!");
+
+        const deletedEntry = await dbClient.Entry.delete({
+            where : {
+                id : foundEntry.id
+            }
+        })
+
+        return deletedEntry;
+    } catch (error) {
+        throw error;
+    }
+}

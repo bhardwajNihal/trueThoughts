@@ -176,7 +176,7 @@ const FilterEntriesComp = ({ entries, collectionName }) => {
                         <DialogTitle className={"text-lg text-amber-700 font-semibold mb-1"}>Delete "{collectionName}" collection?</DialogTitle>
                         <DialogDescription>
                             <span className="text-red-500 mb-6">This action cannot be undone. This will permanently delete this collection and all the journals associated with it!</span>
-                            <div className='flex justify-end gap-2'>
+                            <span className='flex w-full justify-end gap-2'>
                                 <Button 
                                 onClick={() => setDeleteDialog(false)}
                                 variant="outline">Cancel</Button>
@@ -185,7 +185,7 @@ const FilterEntriesComp = ({ entries, collectionName }) => {
                                     variant="destructive"
                                     className={"min-w-32"}
                                     >{isDeleting ? <ClipLoader size={"15px"} color='white'/> : "Delete"}</Button>
-                            </div>
+                            </span>
                         </DialogDescription>
                     </DialogHeader>
                 </DialogContent>

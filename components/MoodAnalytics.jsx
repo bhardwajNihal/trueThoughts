@@ -51,10 +51,15 @@ const MoodAnalytics = () => {
                                 <span className='text-xs m-1 text-gray-500'>in past {period=="7d" ? "7" : period=="15d" ? "15" : "30"} days</span>    
                             </span>    
                         </div>
-                        <div className="total-score col-span-3 lg:col-span-2 shadow shadow-gray-400 bg-gray-100 h-24 rounded-lg flex flex-col items-center justify-end p-2 sm:p-4 gap-1"><span className='md:text-lg text-gray-600'>Avg. Mood Score</span><span className='text-2xl lg:text-4xl text-amber-700' >{analyticsData?.data.overallStats.avgMoodScore}/10</span></div>
+                        <div className="total-score col-span-3 lg:col-span-2 shadow shadow-gray-400 bg-gray-100 h-24 rounded-lg flex flex-col items-center justify-end p-2 sm:p-4 gap-1"><span className='md:text-lg text-gray-600'>Avg. Mood Score</span><span className='text-2xl lg:text-4xl text-amber-700' >{analyticsData?.data.overallStats.totalEntries===0 ? "0" : analyticsData?.data.overallStats.avgMoodScore }/10</span></div>
                         <div className="total-score col-span-6 lg:col-span-2 shadow shadow-gray-400 bg-gray-100 h-24 rounded-lg flex flex-col items-center justify-center p-2 sm:p-4 gap-1">
-                            <span className='text-lg md:text-2xl text-amber-700'>{getMoodById(analyticsData?.data.overallStats.mostFrequentMood)?.emoji}{analyticsData?.data.overallStats.mostFrequentMood} <span className='text-sm text-gray-500'>mostly</span></span>
+                            {analyticsData?.data.overallStats.totalEntries===0
+                            ? <span className='text-gray-500 text-lg'>🖋️Add entries to get mood trends.</span>
+                            : <div className='w-full h-full flex flex-col items-center gap-1'>
+                                <span className='text-lg md:text-2xl text-amber-700'>{getMoodById(analyticsData?.data.overallStats.mostFrequentMood)?.emoji}<span className='text-sm text-gray-500 px-1 pl-3'>Frequently</span>{analyticsData?.data.overallStats.mostFrequentMood} </span>
                             <span className='text-sm lg:text-lg text-gray-600' >{getMoodTrend(analyticsData?.data.overallStats.avgMoodScore)}</span>
+                            </div>    
+                        }
                         </div>
                     </div>
                     <div className="chart min-h-40 w-full shadow shadow-gray-400 bg-gray-100 my-4 rounded-lg"></div>
