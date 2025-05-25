@@ -1,6 +1,7 @@
 
 import { getEntry } from '@/actions/entries';
 import DeleteEntryDialog from '@/components/DeleteEntryDialog';
+import EditEntry from '@/components/EditEntry';
 import { getMoodById } from '@/lib/moods';
 import { format } from 'date-fns';
 import { htmlToText } from 'html-to-text';
@@ -23,7 +24,7 @@ const ViewJournalPage = async ({ params }) => {
       <div className='w-full flex justify-center'>
         <div className="flex relative h-64 w-2/3 rounded-2xl overflow-hidden shadow-md mb-6">
           <Image
-            src={entryDetails?.moodImageUrl || "/fallback.jpg"}
+            src={entryDetails?.moodImageUrl || "./fallback.png"}
             alt={entryDetails?.mood || "Mood"}
             fill
             className="object-cover"
@@ -38,9 +39,7 @@ const ViewJournalPage = async ({ params }) => {
         </div>
         {/* Action buttons */}
         <div className="flex gap-3">
-          <button className="flex items-center text-sm cursor-pointer hover:bg-blue-500 hover:text-white gap-2 sm:px-4 p-1 border border-blue-700 text-blue-500 rounded">
-            <Edit size={18} /> <span className='hidden sm:block'>Edit</span>
-          </button>
+          <EditEntry entryId={entryDetails.id}/>
 
           {/* delete entry */}
           <DeleteEntryDialog entry={entryDetails}/>

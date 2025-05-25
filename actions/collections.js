@@ -141,8 +141,6 @@ export async function getCollection(collectionName) {
 
 
 export async function deleteCollection(collectionName) {
-
-  console.log(collectionName);
   
   try {
     const { userId } = await auth();

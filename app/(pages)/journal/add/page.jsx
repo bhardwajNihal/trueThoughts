@@ -17,7 +17,7 @@ import {
 import { getMoodById, MOODS } from '@/lib/moods';
 import { Button } from '@/components/ui/button';
 import useFetch from '@/app/hooks/useFetch';
-import { addJournalEntry } from '@/actions/journalEntry';
+import { addJournalEntry } from '@/actions/addJournalEntry';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { getCollections } from '@/actions/collections';
