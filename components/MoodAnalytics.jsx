@@ -6,6 +6,7 @@ import AnalyticsLoadingSkeleton from './AnalyticsLoadingSkeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getMoodById, getMoodTrend } from '@/lib/moods'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { format, parseISO } from 'date-fns'
 
 const MoodAnalytics = () => {
 
@@ -28,50 +29,6 @@ const MoodAnalytics = () => {
     }, [analyticsData, analyticsLoading])
 
 
-    const chartData = [
-  {
-    "name": "Page A",
-    "uv": 4000,
-    "pv": 2400,
-    "amt": 2400
-  },
-  {
-    "name": "Page B",
-    "uv": 3000,
-    "pv": 1398,
-    "amt": 2210
-  },
-  {
-    "name": "Page C",
-    "uv": 2000,
-    "pv": 9800,
-    "amt": 2290
-  },
-  {
-    "name": "Page D",
-    "uv": 2780,
-    "pv": 3908,
-    "amt": 2000
-  },
-  {
-    "name": "Page E",
-    "uv": 1890,
-    "pv": 4800,
-    "amt": 2181
-  },
-  {
-    "name": "Page F",
-    "uv": 2390,
-    "pv": 3800,
-    "amt": 2500
-  },
-  {
-    "name": "Page G",
-    "uv": 3490,
-    "pv": 4300,
-    "amt": 2100
-  }
-]
 
     return (
         <div className='relative'>
@@ -108,17 +65,37 @@ const MoodAnalytics = () => {
                             }
                         </div>
                     </div>
-                    <div className="chart w-full h-56 md:h-64 lg:h-80 shadow shadow-gray-400 bg-gray-100 my-4 rounded-lg">
+
+                    <h2 className='text-xl md:text-2xl font-semibold text-amber-700 mt-4'>Mood Trend</h2>
+                    <p className='text-gray-500 backdrop-blur-xs mb-2'>How you've been feeling in last {period=='7d' ? "7 days" : period=="15d" ? "15 days" : "30 days"}</p>
+                    <div className="chart w-full h-56 md:h-64 lg:h-[350px] shadow mb-4 shadow-gray-400 bg-gray-100 rounded-lg p-4 pt-8">
                         <ResponsiveContainer width={'100%'} height={'100%'}>
-                            <LineChart data={chartData} width={"100%"} height={"100%"}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="pv" stroke="#8884d8" />
-                            <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-                        </LineChart>
+                            <LineChart data={analyticsData?.data.entryChartData} width={"100%"} height={"100%"}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="date"
+                                    tickFormatter={(date) => format(parseISO(date), "MMM d")}  //converting date key to mm dd format to show on chart
+                                />
+                                <YAxis yAxisId="left" domain={[0, 10]}      // renge for left-side y-axis
+                                />       
+                                <YAxis
+                                    yAxisId="right"                 // auto range for right y-axis, depicting no. of entries
+                                    orientation="right"
+                                    domain={[0, "auto"]}
+                                />
+                                <Tooltip />
+                                <Legend />
+                                <Line 
+                                yAxisId={"left"}            // line to show avg score trend, dataKey to be one of the keys provided by the chartData
+                                type="monotone" 
+                                dataKey="avgScore" 
+                                stroke="#8884d8" />
+                                <Line
+                                yAxisId={"right"}
+                                type="monotone" 
+                                dataKey="entryCount" 
+                                stroke="#82ca9d" />
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
                 </div>}
