@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { getCollections, getCollectionViaId } from '@/actions/collections';
 import AddCollectionModal from '@/components/AddCollectionModal';
 import { getEntry, updateJournalEntry } from '@/actions/entries';
-import { getDraft, saveDraft } from '@/actions/draftEntry';
+import { deleteDraft, getDraft, saveDraft } from '@/actions/draftEntry';
 import { Truculenta } from 'next/font/google';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
@@ -174,9 +174,7 @@ const AddJournalPage = () => {
         }
 
       // in case of new entry, delete existing draft
-        if (!isEditable) {
-        await saveDraftFn({ title: "", content: "", mood: "" });
-      }
+        if (!isEditable) await deleteDraft();
 
         if (isEditable) {
           router.push(`/journal/${entryActionData.id}`);

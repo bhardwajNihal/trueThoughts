@@ -39,6 +39,8 @@ export async function getDraft() {
 }
 
 export async function saveDraft(data) {
+
+  if(data.title=="" || data.content=="" || data.mood=="") throw new Error("Title, content and mood fields are required to be saved as draft!");
     
  try {
     const { userId } = await auth();
@@ -87,3 +89,46 @@ export async function saveDraft(data) {
   }
 
 }
+
+
+export async function deleteDraft() {
+    
+ try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      throw new Error("Unauthorized request!");
+    }
+
+    // find user
+    const foundUser = await dbClient.User.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+    
+    if (!foundUser) throw new Error("User not found!");
+
+    const foundDraft = await dbClient.Draft.findFirst({
+      where : {
+        userId : foundUser.id
+      }
+    });
+
+    if(!foundDraft) return;
+
+    await dbClient.Draft.delete({
+      where : {
+        userId : foundUser.id
+      }
+    })
+
+    revalidatePath("/dashboard")
+    return createdDraft;
+
+  } catch (error) {
+    throw error;
+  }
+
+}
+
