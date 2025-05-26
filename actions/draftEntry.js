@@ -1,5 +1,7 @@
+"use server"
 import { dbClient } from "@/db/dbClient";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 
 export async function getDraft() {

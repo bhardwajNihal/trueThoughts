@@ -1,6 +1,6 @@
 "use client"
 import dynamic from 'next/dynamic';
-import React, { useEffect, useReducer, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import 'react-quill-new/dist/quill.snow.css';
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,10 +20,11 @@ import useFetch from '@/app/hooks/useFetch';
 import { addJournalEntry } from '@/actions/addJournalEntry';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { getCollection, getCollections, getCollectionViaId } from '@/actions/collections';
+import { getCollections, getCollectionViaId } from '@/actions/collections';
 import AddCollectionModal from '@/components/AddCollectionModal';
 import { getEntry, updateJournalEntry } from '@/actions/entries';
-import { nullable } from 'zod';
+import { getDraft, saveDraft } from '@/actions/draftEntry';
+import { Truculenta } from 'next/font/google';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -39,6 +40,25 @@ const AddJournalPage = () => {
   console.log("edit id  : ", editId);
 
   const [isEditable, setIsEditable] = useState(false);
+
+  // initializing useform
+  // control is used to handle 3rd party components inside hook-form
+  const { register,
+    handleSubmit,
+    control,
+    formState: { errors,isDirty },
+    reset,
+    watch } = useForm({
+      resolver: zodResolver(journalEntrySchema),
+      defaultValues: {
+        title: "",
+        content: "",
+        mood: "",
+        collectionId: ""
+      }
+    })
+  // to render content title reactively
+  const selectedMood = watch("mood");
 
   // if editid is provided in the search params
   // -> set isEditable to be true in the 1st mount
@@ -78,28 +98,49 @@ const AddJournalPage = () => {
   // when the write new page loaded
   // check of any draft --> if any --> populate form with it.
   // if not --> goes as normal >> fill form publish and the entry is created.
+  const {
+    data : draftData,
+    loading : fetchingDraft, 
+    fn : fetchDraftFn
+  } = useFetch(getDraft)
 
+  useEffect(() => {   // fetch draft on normal add page load, not the edit one
+    if(!isEditable){
+      fetchDraftFn();
+    }
+  },[isEditable])
 
-
-
-  // initializing useform
-  // control is used to handle 3rd party components inside hook-form
-  const { register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    reset,
-    watch } = useForm({
-      resolver: zodResolver(journalEntrySchema),
-      defaultValues: {
-        title: "",
-        content: "",
-        mood: "",
-        collectionId: ""
+  useEffect(()=>{
+    // check for the draft, populate the form
+      if(!isEditable && draftData && !fetchingDraft){
+        reset({
+        title : draftData?.title,
+        mood : draftData?.mood,
+        content : draftData?.content
+        })
       }
-    })
-  // to render content title reactively
-  const selectedMood = watch("mood");
+  },[isEditable,draftData, fetchingDraft])
+
+
+  // saving draft functionality
+  const{
+    data : savedDraftData, 
+    loading : savingDraft,
+    fn : saveDraftFn
+  } = useFetch(saveDraft)
+
+  const formData = watch();       // to look for form changes
+  async function handleSaveDraft() {
+    saveDraftFn(formData)
+  }
+
+  useEffect(() => {
+    if(savedDraftData && !savingDraft){
+      toast.success("Draft saved successfully!", {richColors:true})
+    }
+  },[savedDraftData, savingDraft])
+
+
 
   //JOURNAL ENTRY
   // calling useFetch hook to invoke server action to add journal entry
@@ -126,10 +167,16 @@ const AddJournalPage = () => {
     if (entryActionData && !entryActionLoading) {
       console.log("added entry details : ", entryActionData);
       (async () => {
+        let collectionDetails; 
         if (entryActionData.collectionId){
-          const collectionDetails = await getCollectionViaId(entryActionData.collectionId);
+          collectionDetails = await getCollectionViaId(entryActionData.collectionId);
           console.log("collection details:", collectionDetails);
         }
+
+      // in case of new entry, delete existing draft
+        if (!isEditable) {
+        await saveDraftFn({ title: "", content: "", mood: "" });
+      }
 
         if (isEditable) {
           router.push(`/journal/${entryActionData.id}`);
@@ -158,9 +205,9 @@ const AddJournalPage = () => {
 
   return (
     <div>
-      <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>{isEditable ? "Edit Journal Entry" : "Have some thoughts? Start Journaling..."}</h2>
+      <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>{isEditable ? "Edit Journal Entry" : draftData ? "You have a saved draft..." : "Have some thoughts? Start Journaling..."}</h2>
 
-      {entryActionLoading && <BarLoader width={"100%"} color='orange' />}
+      {entryActionLoading && existingEntryLoading && fetchingDraft && <BarLoader width={"100%"} color='orange' />}
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -261,17 +308,28 @@ const AddJournalPage = () => {
         </div>
 
         <div className='flex gap-4'>
+
+            {!isEditable && <Button
+            disabled={savingDraft && !isDirty}    // isDirty checks if form has changed, comes from useform
+            onClick={(e) => {
+              e.preventDefault();
+              handleSaveDraft()}
+            }
+            className={`h-9 w-32 sm:w-44 my-6 bg-transparent border border-amber-700 text-amber-700 hover:bg-amber-100`}>
+            {savingDraft && <ClipLoader size={"15px"} color='brown' className='mr-1'/>}save as Draft
+          </Button>}
+
           {isEditable && <Button
             onClick={(e) => {
               e.preventDefault();
               router.push(`/journal/${existingEntryData.id}`)
             }
             }
-            className={`h-9 w-32 sm:w-44 my-6 bg-transparent border border-amber-700 text-amber-700`}>
+            className={`h-9 w-32 sm:w-44 my-6 bg-transparent border border-amber-700 text-amber-700 hover:bg-amber-100`}>
             cancel
           </Button>}
           <Button
-            disabled={entryActionLoading}
+            disabled={entryActionLoading && !isDirty}
             variant="journal"
             className={`h-9 w-32 sm:w-44 my-6`}
             type="submit">
