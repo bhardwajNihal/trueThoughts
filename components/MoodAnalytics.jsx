@@ -68,7 +68,7 @@ const MoodAnalytics = () => {
 
                     <h2 className='text-xl md:text-2xl font-semibold text-amber-700 mt-4'>Mood Trend</h2>
                     <p className='text-gray-500 backdrop-blur-xs mb-2'>How you've been feeling in last {period=='7d' ? "7 days" : period=="15d" ? "15 days" : "30 days"}</p>
-                    <div className="chart w-full h-56 md:h-64 lg:h-[350px] shadow mb-4 shadow-gray-400 bg-gray-100 rounded-lg p-4 pt-8">
+                    <div className="chart w-full h-56 md:h-64 lg:h-[350px] shadow mb-4 shadow-gray-400 bg-gray-100 rounded-lg sm:p-4 pt-4 sm:pt-8">
                         <ResponsiveContainer width={'100%'} height={'100%'}>
                             <LineChart data={analyticsData?.data.entryChartData} width={"100%"} height={"100%"}>
                                 <CartesianGrid strokeDasharray="3 3" />

@@ -40,7 +40,7 @@ const CollectionPreview = ({ type, entries, collectionName }) => {
                     </div>
                 </div>
 
-                <div className='absolute cursor-pointer w-full bg-gradient-to-t from-amber-700/40 to-transparent bottom-0 flex justify-center items-end p-2 h-14 hover:h-full hover:text-amber-800 duration-300 text-amber-600 z-50 flex items-center text-sm gap-2'>show all <ArrowRight className='mb-[2px]' size={"15px"} /></div>
+                <div className='absolute cursor-pointer w-full bg-gradient-to-t from-amber-400 to-transparent bottom-0 flex justify-center items-end p-2 h-14 hover:h-full hover:text-amber-800 duration-300 text-amber-600 z-50 flex items-center text-sm gap-2'>open collection <ArrowRight className='mb-[2px]' size={"15px"} /></div>
 
                 {/* Entries */}
                 <div className="relative p-3 space-y-2">

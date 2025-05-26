@@ -44,7 +44,10 @@ const FilterEntriesComp = ({ entries, collectionName }) => {
 
         if (searchQuery) {
             filtered = filtered.filter(entry => {
-                if ((entry.title.toLowerCase()).includes(searchQuery.toLowerCase()) || (entry.content.toLowerCase()).includes(searchQuery.toLowerCase())) return entry;
+                if (
+                (entry.title.toLowerCase()).includes(searchQuery.toLowerCase())
+             || (entry.content.toLowerCase()).includes(searchQuery.toLowerCase())
+             || (entry?.collection?.name.toLowerCase())?.includes(searchQuery.toLowerCase())) return entry;
             })
         }
 

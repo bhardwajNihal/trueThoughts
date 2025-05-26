@@ -3,6 +3,9 @@ import { getEntries } from '@/actions/entries'
 import CollectionPreview from '@/components/CollectionPreview';
 import React from 'react'
 import MoodAnalytics from '@/components/MoodAnalytics';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const Dashboard = async () => {
 
@@ -33,7 +36,19 @@ const Dashboard = async () => {
 
 
       <div className="collections">
-        <h2 className='text-3xl font-semibold md:5xl text-amber-700 mb-3 text-center sm:text-start'>Collections</h2>
+
+        <div className='flex flex-col gap-3 md:flex-row md:justify-between mt-4'>
+          <h2 className='text-3xl font-semibold md:5xl text-amber-700 mb-3 text-center sm:text-start'>Collections</h2>
+          <Link href={"/collection/all"} className='flex justify-end'>
+            <Button
+              variant={"ghost"}
+              className={"flex justify-center items-center gap-1 text-amber-700 text-sm"}>
+              <span>show all entries</span> <ArrowRight color='brown' size={"15px"} />
+            </Button>
+          </Link>
+
+        </div>
+
         <div className="items grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <CollectionPreview type={"new"} />
 
