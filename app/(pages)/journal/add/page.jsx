@@ -18,10 +18,12 @@ import { getMoodById, MOODS } from '@/lib/moods';
 import { Button } from '@/components/ui/button';
 import useFetch from '@/app/hooks/useFetch';
 import { addJournalEntry } from '@/actions/addJournalEntry';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { getCollections } from '@/actions/collections';
+import { getCollection, getCollections, getCollectionViaId } from '@/actions/collections';
 import AddCollectionModal from '@/components/AddCollectionModal';
+import { getEntry, updateJournalEntry } from '@/actions/entries';
+import { nullable } from 'zod';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -30,6 +32,54 @@ const AddJournalPage = () => {
 
   const router = useRouter()
   const [addCollectionsPopup, setAddCollectionsPopup] = useState(false);
+
+  // check if the editId is in the search params
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+  console.log("edit id  : ", editId);
+
+  const [isEditable, setIsEditable] = useState(false);
+
+  // if editid is provided in the search params
+  // -> set isEditable to be true in the 1st mount
+  // fetch the entrydetails and populate form with it.
+  // show edit button / else show publish button  
+  // a cancel button --> on click navigate to the journal entry page with the id.
+
+  useEffect(() => {
+    if (editId) {
+      setIsEditable(true)
+      fetchExistingEntryFn(editId);
+
+    }
+  }, [editId])
+
+  const {
+    data: existingEntryData,
+    loading: existingEntryLoading,
+    fn: fetchExistingEntryFn,
+  } = useFetch(getEntry)
+
+  useEffect(() => {
+    if (isEditable && existingEntryData && !existingEntryLoading) {
+      console.log(existingEntryData);
+
+      reset({
+        title: existingEntryData.title || "",
+        content: existingEntryData.content || "",
+        mood: existingEntryData.mood || "",
+        collectionId: existingEntryData.collectionId || "",
+      })
+    }
+  }, [isEditable, existingEntryData, existingEntryLoading])
+
+
+  //Draft functionality.
+  // when the write new page loaded
+  // check of any draft --> if any --> populate form with it.
+  // if not --> goes as normal >> fill form publish and the entry is created.
+
+
 
 
   // initializing useform
@@ -52,25 +102,47 @@ const AddJournalPage = () => {
   const selectedMood = watch("mood");
 
   //JOURNAL ENTRY
-  // calling useFetch hook to invoke server action to make journal entry
-  const { data: addJournalData,
-    loading: addJournalLoading,
-    fn: addJournalFn
-  } = useFetch(addJournalEntry)
+  // calling useFetch hook to invoke server action to add journal entry
+  // or editjournalEntry if editId is provided
+  const { data: entryActionData,
+    loading: entryActionLoading,
+    fn: entryActionFn
+  } = useFetch(isEditable ? updateJournalEntry : addJournalEntry)
 
   const onSubmit = async (data) => {
-    addJournalFn({ ...data })    // calling the fn, passing title, mood, content, and collectionId(optional)
 
+    const formData = {
+      ...data,
+      ...(isEditable && {id : editId}),     // provide id in case of edit
+      // in case of entry updation, if entry is moved to miscellaneous collections
+      collectionId : data.collectionId==="misc" ? null : data.collectionId
+    }
+
+    entryActionFn(formData)    // calling the fn, passing title, mood, content, and collectionId(optional)
   };
   // if formSubmitted successfully, the data must be returned
   // routing to the collections page after successful journal entry
   useEffect(() => {
-    if (addJournalData && !addJournalLoading) {
-      // router.push(`/collections/${addJournalData.collectionId ? addJournalData.collectionId : "miscellaneous"}`)
-      toast.success("Journal entry added successfully!", { richColors: true });
-      reset();
+    if (entryActionData && !entryActionLoading) {
+      console.log("added entry details : ", entryActionData);
+      (async () => {
+        if (entryActionData.collectionId){
+          const collectionDetails = await getCollectionViaId(entryActionData.collectionId);
+          console.log("collection details:", collectionDetails);
+        }
+
+        if (isEditable) {
+          router.push(`/journal/${entryActionData.id}`);
+        } else {
+          router.push(`/collection/${entryActionData.collectionId ? collectionDetails?.name : "miscellaneous"}`);
+        }
+
+        toast.success(`Journal entry ${isEditable ? "updated" : "added"} successfully!`, { richColors: true });
+        reset();
+      })();
+
     }
-  }, [addJournalData, addJournalLoading])
+  }, [entryActionData, entryActionLoading])
 
 
   // FETCHING COLLECTIONS 
@@ -86,9 +158,9 @@ const AddJournalPage = () => {
 
   return (
     <div>
-      <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>Have some thoughts? Start Journaling...</h2>
+      <h2 className='text-2xl w-fit sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-orange-700 via-amber-500 to-orange-300 text-transparent bg-clip-text py-4'>{isEditable ? "Edit Journal Entry" : "Have some thoughts? Start Journaling..."}</h2>
 
-      {addJournalLoading && <BarLoader width={"100%"} color='orange' />}
+      {entryActionLoading && <BarLoader width={"100%"} color='orange' />}
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -176,6 +248,11 @@ const AddJournalPage = () => {
                   {collectionsData && collectionsData.map(collection =>
                     <SelectItem key={collection.id} value={collection.id}>{collection.name}</SelectItem>
                   )}
+                  {existingEntryData?.collectionId && (
+                    <SelectItem value="misc">
+                      Miscellaneous
+                    </SelectItem>
+                  )}
                   <SelectItem value="new" className={`text-amber-700`}>+ Create new Collection</SelectItem>
                 </SelectContent>
               </Select>
@@ -183,11 +260,29 @@ const AddJournalPage = () => {
           />
         </div>
 
-        <Button disabled={addJournalLoading} variant="journal" className={`h-9 w-32 sm:w-44 my-6`} type="submit">{addJournalLoading ? <ClipLoader size={"15px"} color='white' /> : "Publish"}</Button>
+        <div className='flex gap-4'>
+          {isEditable && <Button
+            onClick={(e) => {
+              e.preventDefault();
+              router.push(`/journal/${existingEntryData.id}`)
+            }
+            }
+            className={`h-9 w-32 sm:w-44 my-6 bg-transparent border border-amber-700 text-amber-700`}>
+            cancel
+          </Button>}
+          <Button
+            disabled={entryActionLoading}
+            variant="journal"
+            className={`h-9 w-32 sm:w-44 my-6`}
+            type="submit">
+            {entryActionLoading ? <ClipLoader size={"15px"} color='white' />
+              : isEditable ? "Update" : "Publish"}
+          </Button>
+        </div>
 
       </form>
 
-      <AddCollectionModal open={addCollectionsPopup} setOpen={setAddCollectionsPopup} fetchCollections={fetchCollectionFn}/>
+      <AddCollectionModal open={addCollectionsPopup} setOpen={setAddCollectionsPopup} fetchCollections={fetchCollectionFn} />
 
     </div>
 

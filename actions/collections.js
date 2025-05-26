@@ -140,6 +140,40 @@ export async function getCollection(collectionName) {
 
 
 
+export async function getCollectionViaId(collectionId) {
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      throw new Error("Unauthorized request!");
+    }
+
+    // find user
+    const foundUser = await dbClient.User.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+    
+    if (!foundUser) throw new Error("User not found!");
+
+    // fetch the collections from the db belonging to the logged in user
+    const collection = await dbClient.Collection.findUnique({
+      where: {
+        userId: foundUser.id,
+        id : collectionId
+      },
+
+    });
+    
+    return collection;
+
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 export async function deleteCollection(collectionName) {
   
   try {

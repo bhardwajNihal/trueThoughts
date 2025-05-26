@@ -2,7 +2,8 @@
 "use server"
 import { dbClient } from "@/db/dbClient";
 import { aj } from "@/lib/arcjet";
-import { getMoodById } from "@/lib/moods";
+import { getPixabayImage } from "@/lib/getImage";
+import { getMoodById, MOODS } from "@/lib/moods";
 import { request } from "@arcjet/next";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -138,6 +139,10 @@ export default  async function deleteEntry(entryId) {
 
 
 export async function updateJournalEntry(entry) {
+    console.log("inside update journal action");
+    console.log("entry recieved : ", entry);
+    
+    
   try {
     // check if session valid
     const { userId } = await auth();
@@ -182,6 +187,9 @@ export async function updateJournalEntry(entry) {
             id : entry.id
         }
     })
+
+    console.log("found entry : ", existingEntry);
+    
     if(!existingEntry){
         throw new Error("entry not found!")
     }
@@ -204,9 +212,10 @@ export async function updateJournalEntry(entry) {
         mood: moodData.id,
         moodScore: moodData.score,
         moodImageUrl,
-        collectionId: data.collectionId || null,
+        collectionId: entry.collectionId || null,
       },
     });
+console.log("Updated entry details : ",updatedJournalEntry);
 
     revalidatePath("/dashboard");
     revalidatePath(`/journal/${entry.id}`)
