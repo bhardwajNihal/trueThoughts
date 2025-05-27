@@ -9,8 +9,8 @@ const Header = async() => {
   await checkUser();
 
   return (
-    <div className='flex justify-between items-center h-12 w-full py-8 px-6 sm:px-10 md:px-16 lg:px-24 bg-orange-100/50 backdrop-blur-sm rounded-b-4xl container mx-auto sm:rounded-b-full border-b-1 border-orange-500'>
-      <Link href={"/"}><div className="logo h-8 sm:h-10 md:h-11 bg-red-500"><img className='w-full object-cover h-full' src="/logo.png" alt="" /></div></Link>
+    <div className='flex justify-between items-center h-12 w-full py-8 px-6 sm:px-10 md:px-16 lg:px-24 backdrop-blur bg-orange-100/40 rounded-b-4xl container mx-auto sm:rounded-b-full border-b-1 border-orange-500'>
+      <Link href={"/"}><div className='text-amber-700/80 text-shadow-sm text-xl sm:text-2xl md:text-3xl font-black text-shadow-amber-700/30'>trueThoughts</div></Link>
       <div className="menu">
         <ul className='flex gap-2'>
           <SignedOut>

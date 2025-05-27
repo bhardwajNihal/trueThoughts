@@ -17,13 +17,11 @@ const CollectionsPage = async ({ params }) => {
     }
     if (collectionName === "miscellaneous") {
         entries = await getEntries({ collectionId: "miscellaneous" })
-        console.log(entries);
 
     }
     else {
         const collectionDetails = await getCollection(collectionName);
         entries = await getEntries({ collectionId: collectionDetails?.id })
-        console.log("---Entries--- : ", entries);
     }
 
 

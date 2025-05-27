@@ -37,7 +37,6 @@ const AddJournalPage = () => {
   // check if the editId is in the search params
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
-  console.log("edit id  : ", editId);
 
   const [isEditable, setIsEditable] = useState(false);
 
@@ -82,7 +81,7 @@ const AddJournalPage = () => {
 
   useEffect(() => {
     if (isEditable && existingEntryData && !existingEntryLoading) {
-      console.log(existingEntryData);
+  
 
       reset({
         title: existingEntryData.title || "",
@@ -165,12 +164,12 @@ const AddJournalPage = () => {
   // routing to the collections page after successful journal entry
   useEffect(() => {
     if (entryActionData && !entryActionLoading) {
-      console.log("added entry details : ", entryActionData);
+  
       (async () => {
         let collectionDetails; 
         if (entryActionData.collectionId){
           collectionDetails = await getCollectionViaId(entryActionData.collectionId);
-          console.log("collection details:", collectionDetails);
+      
         }
 
       // in case of new entry, delete existing draft

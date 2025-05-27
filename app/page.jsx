@@ -7,7 +7,9 @@ import {
     ChevronRight,
     BarChart2,
     FileText,
+    
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -21,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { getDailyPrompt } from "@/actions/dailyPrompt";
 import { faqs } from "@/lib/FaqData";
+
 const features = [
     {
         icon: Book,
@@ -47,12 +50,13 @@ export default async function LandingPage() {
 
     return (
         <div className="relative container mx-auto pt-16 pb-16 overflow-hidden">
+
             {/* Gradient background for a softer feel */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-br from-orange-50 to-amber-50 opacity-70"></div>
+            {/* <div className="absolute inset-0 z-0 bg-gradient-to-br from-orange-50 to-amber-50 opacity-70"></div> */}
 
             {/* Hero Section */}
-            <div className="relative z-10 max-w-5xl mx-auto text-center space-y-4 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-6xl md:text-6xl lg:text-7xl font-black bg-gradient-to-br from-amber-800 py-4 to-orange-300 bg-clip-text text-transparent">
+            <div className="relative z-10  max-w-5xl mx-auto text-center space-y-4 px-4 sm:px-6 lg:px-8">
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-br from-amber-800 py-4 to-orange-300 bg-clip-text text-transparent">
                     Your true Thoughts.<br /> Now Journaled. Organized. Maintained.
                 </h1>
                 <p className="text-xl md:text-2xl text-amber-700 font-semibold mx-auto opacity-90 mb-4">
@@ -92,7 +96,7 @@ export default async function LandingPage() {
                     <Link href="/dashboard">
                         <Button
                             variant={"journal"}
-                            className="bg-gradient-to-br from-amber-700 to-amber-400 py-6 rounded-lg flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-1"
+                            className="bg-gradient-to-br text-lg from-amber-700 to-amber-400 py-6 rounded-lg flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out transform hover:-translate-y-1"
                         >
                             Start Journaling <ChevronRight className="h-5 w-5" />
                         </Button>
@@ -100,7 +104,7 @@ export default async function LandingPage() {
                     <Link href="#features">
                         <Button
                             variant="outline"
-                            className="px-10 py-6 rounded-lg border border-amber-700 text-amber-700 hover:bg-orange-100 hover:text-orange-700 transition-all duration-200 ease-in-out"
+                            className="px-10 py-6 rounded-lg border text-lg border-amber-700 text-amber-700 hover:bg-orange-100 hover:text-orange-700 transition-all duration-200 ease-in-out"
                         >
                             Learn More
                         </Button>
@@ -108,7 +112,7 @@ export default async function LandingPage() {
                 </div>
             </div>
 
-            ---
+
 
             {/* Feature Cards Section - Enhanced grid and card aesthetics */}
             <section id="features" className="relative z-10 mt-28 grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 sm:px-6 lg:px-8">
@@ -129,7 +133,7 @@ export default async function LandingPage() {
                 ))}
             </section>
 
-            ---
+
 
             <div className="relative z-10 space-y-32 mt-32 px-4 sm:px-6 lg:px-8">
                 {/* Feature 1: Rich Text Editor - More dynamic layout and richer preview */}
@@ -200,39 +204,39 @@ export default async function LandingPage() {
                             </li>
                         </ul>
                     </div>
-                <div className="space-y-6 bg-white rounded-3xl shadow-2xl p-8 border border-orange-100 md:order-1 animate-fade-in-up delay-300">
-                    {/* More detailed Analytics Preview */}
-                    <div className="h-56 bg-gradient-to-tr from-orange-100 to-orange-50 rounded-xl shadow-inner flex items-end p-4">
-                        {/* Example bars for a simple chart */}
-                        <div className="flex w-full justify-around h-full items-end">
-                            <div className="w-8 bg-orange-300 h-2/3 rounded-t-md animate-grow-up" />
-                            <div className="w-8 bg-orange-400 h-1/2 rounded-t-md animate-grow-up delay-100" />
-                            <div className="w-8 bg-orange-500 h-3/4 rounded-t-md animate-grow-up delay-200" />
-                            <div className="w-8 bg-orange-300 h-2/5 rounded-t-md animate-grow-up delay-300" />
-                            <div className="w-8 bg-orange-400 h-4/5 rounded-t-md animate-grow-up delay-400" />
+                    <div className="space-y-6 bg-white rounded-3xl shadow-2xl p-8 border border-orange-100 md:order-1 animate-fade-in-up delay-300">
+                        {/* More detailed Analytics Preview */}
+                        <div className="h-56 bg-gradient-to-tr from-orange-100 to-orange-50 rounded-xl shadow-inner flex items-end p-4">
+                            {/* Example bars for a simple chart */}
+                            <div className="flex w-full justify-around h-full items-end">
+                                <div className="w-8 bg-orange-300 h-2/3 rounded-t-md animate-grow-up" />
+                                <div className="w-8 bg-orange-400 h-1/2 rounded-t-md animate-grow-up delay-100" />
+                                <div className="w-8 bg-orange-500 h-3/4 rounded-t-md animate-grow-up delay-200" />
+                                <div className="w-8 bg-orange-300 h-2/5 rounded-t-md animate-grow-up delay-300" />
+                                <div className="w-8 bg-orange-400 h-4/5 rounded-t-md animate-grow-up delay-400" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex justify-between text-sm text-orange-600 font-medium px-2">
-                        <span className="h-4 w-16 bg-orange-100 rounded" />
-                        <span className="h-4 w-16 bg-orange-100 rounded" />
-                        <span className="h-4 w-16 bg-orange-100 rounded" />
-                        <span className="h-4 w-16 bg-orange-100 rounded" />
+                        <div className="flex justify-between text-sm text-orange-600 font-medium px-2">
+                            <span className="h-4 w-16 bg-orange-100 rounded" />
+                            <span className="h-4 w-16 bg-orange-100 rounded" />
+                            <span className="h-4 w-16 bg-orange-100 rounded" />
+                            <span className="h-4 w-16 bg-orange-100 rounded" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-            ---
 
-        {/* Testimonials Carousel */ }
-        < div className = "relative z-10 mt-32 px-4 sm:px-6 lg:px-8" >
-            <TestimonialCarousel />
+
+            {/* Testimonials Carousel */}
+            < div className="relative z-10 mt-32 px-10 sm:px-14 lg:px-20" >
+                <TestimonialCarousel />
             </div >
 
-        ---
 
-        {/* FAQ Section - Improved styling and spacing */ }
-        < div className = "relative z-10 mt-32 px-4 sm:px-6 lg:px-8" >
+
+            {/* FAQ Section - Improved styling and spacing */}
+            < div className="relative z-10 mt-32 px-4 sm:px-6 lg:px-8" >
                 <h2 className="text-4xl font-bold text-center text-orange-900 mb-16 leading-tight">
                     Frequently Asked Questions
                 </h2>
@@ -241,7 +245,7 @@ export default async function LandingPage() {
                         <AccordionItem
                             key={index}
                             value={`item-${index}`}
-                            className="bg-white rounded-xl shadow-md border border-orange-100 overflow-hidden"
+                            className=" rounded-xl shadow-md border border-orange-200 backdrop-blur-lg bg-gray-100 overflow-hidden"
                         >
                             <AccordionTrigger className="text-orange-900 text-xl font-semibold py-5 px-6 hover:bg-orange-50 transition-colors duration-200 [&[data-state=open]]:bg-orange-50">
                                 {faq.q}
@@ -254,27 +258,27 @@ export default async function LandingPage() {
                 </Accordion>
             </div >
 
-        ---
 
-        {/* Final CTA Section - More prominent and engaging */ }
-        < div className = "relative z-10 mt-32 mb-16 px-4 sm:px-6 lg:px-8" >
-            <Card className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl shadow-xl p-10 sm:p-12 md:p-16 text-center animate-fade-in-up delay-500">
-                <CardContent className="p-0">
-                    <h2 className="text-4xl sm:text-5xl font-extrabold text-orange-900 mb-8 leading-tight">
-                        Start Reflecting on Your Journey Today.
-                    </h2>
-                    <p className="text-xl text-orange-700 mb-10 max-w-3xl mx-auto leading-relaxed">
-                        Join thousands of individuals who are already discovering the transformative power of digital journaling with us.
-                    </p>
-                    <Link
-                        href={"/sign-in"}>
-                        <Button
-                            size="lg" variant="journal" className="px-12 py-7 text-xl rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 animate-pulse-once">
-                            Get Started for Free <ChevronRight className="ml-3 h-6 w-6" />
-                        </Button>
-                    </Link>
-                </CardContent>
-            </Card>
+
+            {/* Final CTA Section - More prominent and engaging */}
+            < div className="relative z-10 mt-32 mb-16 px-4 sm:px-6 lg:px-8" >
+                <Card className="backdrop-blur-lg bg-orange-100/50 border border-orange-400 rounded-3xl shadow-xl p-10 sm:p-12 md:p-16 text-center animate-fade-in-up delay-500">
+                    <CardContent className="p-0">
+                        <h2 className="text-4xl sm:text-5xl font-extrabold text-orange-900 mb-8 leading-tight">
+                            Start Journaling on Your Thoughts Today.
+                        </h2>
+                        <p className="text-xl text-orange-700 mb-10 max-w-3xl mx-auto leading-relaxed">
+                            Join thousands of individuals who are already discovering the transformative power of digital journaling with us.
+                        </p>
+                        <Link
+                            href={"/sign-in"}>
+                            <Button
+                                size="lg" variant="journal" className="px-12 py-7 text-xl rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 animate-pulse-once">
+                                Get Started for Free <ChevronRight className="ml-3 h-6 w-6" />
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div >
         </div >
     );

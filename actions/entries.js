@@ -139,8 +139,6 @@ export default  async function deleteEntry(entryId) {
 
 
 export async function updateJournalEntry(entry) {
-    console.log("inside update journal action");
-    console.log("entry recieved : ", entry);
     
     
   try {
@@ -188,7 +186,6 @@ export async function updateJournalEntry(entry) {
         }
     })
 
-    console.log("found entry : ", existingEntry);
     
     if(!existingEntry){
         throw new Error("entry not found!")
@@ -215,7 +212,6 @@ export async function updateJournalEntry(entry) {
         collectionId: entry.collectionId || null,
       },
     });
-console.log("Updated entry details : ",updatedJournalEntry);
 
     revalidatePath("/dashboard");
     revalidatePath(`/journal/${entry.id}`)

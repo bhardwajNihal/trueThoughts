@@ -15,7 +15,6 @@ const ViewJournalPage = async ({ params }) => {
   
 
   const entryDetails = await getEntry(id)
-  console.log(entryDetails);
 
 
   return (

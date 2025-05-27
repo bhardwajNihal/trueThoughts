@@ -1,4 +1,9 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Caveat_Brush } from 'next/font/google'
+const caveatBrush = Caveat_Brush({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-caveat-brush',
+})
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -12,16 +17,6 @@ import {
 } from "@clerk/nextjs"; 
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata = {
   title: "truethoughts",
   description: "Your own journal app.",
@@ -32,9 +27,9 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={caveatBrush.variable}
         >
-          <div className="bg-[url('/bg.png')] fixed inset-0 -z-50" />
+          <div className="bg-[url('/bg.png')] bg-no-repeat bg-cover fixed inset-0 -z-50" />
           <Header />
           {children}
           <Toaster />
