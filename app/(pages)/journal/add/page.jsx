@@ -24,7 +24,6 @@ import { getCollections, getCollectionViaId } from '@/actions/collections';
 import AddCollectionModal from '@/components/AddCollectionModal';
 import { getEntry, updateJournalEntry } from '@/actions/entries';
 import { deleteDraft, getDraft, saveDraft } from '@/actions/draftEntry';
-import { Truculenta } from 'next/font/google';
 // called dynamic import
 // prevent ssr of packages that needs browser window to function, and to be only client-side rendered
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });

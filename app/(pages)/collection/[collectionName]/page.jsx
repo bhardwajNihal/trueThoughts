@@ -1,9 +1,7 @@
 
 import { getCollection } from '@/actions/collections';
 import { getEntries } from '@/actions/entries';
-import { ArrowLeft } from 'lucide-react';
 import React from 'react'
-import Link from 'next/link';
 import FilterEntriesComp from '@/components/FilterEntriesComp';
 
 const CollectionsPage = async ({ params }) => {

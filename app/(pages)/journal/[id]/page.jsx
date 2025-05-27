@@ -5,7 +5,6 @@ import EditEntry from '@/components/EditEntry';
 import { getMoodById } from '@/lib/moods';
 import { format } from 'date-fns';
 import { htmlToText } from 'html-to-text';
-import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react'
 
