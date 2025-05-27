@@ -2,9 +2,10 @@ import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@cl
 import React from 'react'
 import Link from 'next/link'
 import { checkUser } from '@/db/checkUser'
-import { FolderArchive } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { Button } from './ui/button'
 
-const Header = async() => {
+const Header = async () => {
 
   await checkUser();
 
@@ -23,8 +24,13 @@ const Header = async() => {
             </SignUpButton>
           </SignedOut>
           <SignedIn>
-            <button><FolderArchive/>Collections</button>
-            <button>Write new</button>
+
+            <Link href={"/journal/add"}>
+            <Button
+              variant={"journal"} className={"text-white"}>Write new <Plus size={"15px"} />
+            </Button>
+            </Link>
+
             <UserButton />
           </SignedIn>
         </ul>
